@@ -1,0 +1,9 @@
+.container{
+  height:120vh;
+  background-repeat: no-repeat;
+  background-size: cover;
+  /* background-image: url("../components/image/Trax-background-06.png"); */
+  /* overflow-y: scroll; */
+  /* width: 100%; */
+  display: flex;
+}

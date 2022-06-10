@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  app:
+    build:
+      context: .
+    volumes:
+      - .:/TRAX_MASTER_PANNEL
+    ports:
+      - 3005:3005
+    image: app:react
+    container_name: react_container
+    command: npm start
