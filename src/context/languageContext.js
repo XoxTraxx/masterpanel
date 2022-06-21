@@ -258,7 +258,7 @@ const langData = {
       traxSolution:
         " TraX’s solution generates millions of unique and secure ID’s. The codes are carrier agnostic, which mean they can be implemented in QR codes, NFC, RFID tags, barcodes, human readable and any new technology that may arise in the future​",
       totalSaleIn22: "Total Industries Sales Performance 2022",
-      mandatoryFieldsRequired: "Mandatory fields are required",
+      // mandatoryFieldsRequired: "Mandatory fields are required",
       topSaledBased: "OVERALL SALES BASED ON INDUSTRIES",
       saleBasedOnIndustry: "Sales Based On Industries",
       traceabilityDetails: "WHY IS TRACEABILITY IMPORTANT?",
@@ -273,6 +273,7 @@ const langData = {
         "CONNECT YOUR SUPPLY CHAINS IN A WHOLE NEW WAY ",
       globalChain: "Global Leader in Blockchain  ",
       taas: "TaaS",
+      privacyPolicyChange:"",
       learnMore: "Learn More",
       coreAdvantages: "CORE ADVANTAGES",
       newWayChainig: " CONNECT YOUR SUPPLY CHAINS IN A WHOLE NEW WAY      ",

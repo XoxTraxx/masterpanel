@@ -1,5 +1,5 @@
 import { uploadFile } from "react-s3";
-
+window.Buffer = window.Buffer || require("buffer").Buffer;
 const options = {
   accessKeyId: "AKIAVKP6QBZ2N2V7DKNT",
   secretAccessKey: "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",

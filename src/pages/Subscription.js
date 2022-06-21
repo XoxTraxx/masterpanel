@@ -71,6 +71,7 @@ const Subscription = () => {
 
     history.push({
       pathname: `/Register`,
+      data:selectedIndex
     });
   };
 

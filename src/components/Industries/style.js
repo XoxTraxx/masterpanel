@@ -8,7 +8,7 @@ const style = {
   mainContainer: {
     p: 4,
     minW: "100%",
-    height:'45vh',
+    height:'50vh',
     borderRadius: 10,
     flexDirection: "column",
     backgroundColor: "white",

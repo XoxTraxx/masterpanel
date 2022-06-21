@@ -78,7 +78,6 @@ const styles = {
   editLabel:{
     w:"60px",
     fontSize:"12px",
-    cursor:"pointer"
   },
   td2:{
     mr:4,
@@ -94,13 +93,11 @@ const styles = {
   PaginateContainer: {
     justifyContent:"center",
     borderRadius:"10",
-    marginBottom:"10",
-    width:"100%"
+    marginBottom:"0",
   },
   loader: {
-   height:"50vh",
-   justifyContent:"flex-end",
-  },
-  
+    height:"50vh",
+    justifyContent:"flex-start",
+   },
 };
 export default styles;

@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import "firebase/messaging";
 import "react-form-builder2/dist/app.css";
 import firebaseApp from "./firebase";
+import firebase from 'firebase/app';
 import { ToastContainer, toast } from "react-toastify";
 import { useToast } from "@chakra-ui/toast";
 import NotificationSystem from "react-notification-system";
@@ -101,7 +102,6 @@ const AppContainer = () => {
   return <AuthApp />;
 };
 
-
 export default function App() {
   const apiManager = ApiManager.getInstance();
   var style = {
@@ -121,16 +121,19 @@ export default function App() {
   };
 
   useEffect(() => {
-   
-    const msg = firebaseApp.messaging();
-    console.log("MESG", msg.onBackgroundMessage);
-    msg
+    let msg = null;
+    if (firebase.messaging.isSupported()){
+      msg = firebaseApp.messaging()
+  } 
+  if(msg)   
+  {
+   msg
       .getToken({
         vapidKey:
-          "BLbszOZ-YI7x26zjVJ1mt5zMdt5tOh1pU0qzeF4bJu9PqGXCwpniV69zko_bm24Ad0s2hwgSbso7RrW5NGqPoCw",
+          "BCuBqEFv_CPV7UNxK1VCFfR2Xe4nnxHOv3TNJV3_y-b0UrJUCDwWeMBtwD9NrACe0RZocbHaYizJWeSOyk8pdjo",
       })
       .then((token) => {
-        console.log("firebase msg token", token);
+         console.log("a gyaa", token);
       })
       .catch((error) => console.log("firebaseError", error));
     msg.onMessage((response) => {
@@ -147,13 +150,13 @@ export default function App() {
       addNotification(payload);
     };
     console.log("window", window);
-  });
+  }});
   global.foo = () => {
     alert("hello");
   };
   const authState = useAuthState();
 
-  console.log('authState',authState)
+  console.log("authState", authState);
   return (
     <AuthProvider>
       <LangProvider>

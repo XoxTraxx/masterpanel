@@ -1,4 +1,4 @@
-import {SET_PAGES,SET_FORMS} from '../Types/types'
+import {SET_PAGES,SET_FORMS,SET_ALLPAGES} from '../Types/types'
 const setPages = (payload) => {
   return {
     type: SET_PAGES,
@@ -11,4 +11,10 @@ const setFroms = (payload) => {
       payload: payload,
     };
   };
-export default { setPages,setFroms };
+  const setAllPages = (payload) => {
+    return {
+      type: SET_ALLPAGES,
+      payload: payload,
+    };
+  };
+export default { setPages,setFroms,setAllPages };

@@ -1,4 +1,4 @@
-import React, { Component, Suspense } from "react";
+import React, { Component, Suspense, useEffect } from "react";
 import {
   Text,
   Flex,
@@ -7,83 +7,128 @@ import {
   useColorModeValue,
   useMediaQuery,
 } from "@chakra-ui/react";
-import {Pagination}  from '../components/Pagination'
-import {pageList} from '../constants/data'
+import {useHistory} from 'react-router-dom'
 import theme from "../config/color";
+import ApiManager from "../config/apiManager";
 import LangContext from "../context/languageContext";
 import All from "../components/FormListComponent/All";
+import { useDispatch, useSelector } from "react-redux";
+import { Pagination } from "../components/Pagination";
 import styles from "../components/FormListComponent/styles";
 import Publish from "../components/FormListComponent/Publish";
 import Unpublish from "../components/FormListComponent/Unpublish";
-import {useDispatch,useSelector} from 'react-redux'
-
+import allActions from "../actions/allActions";
 const PagesList = () => {
+  const apiManager = ApiManager.getInstance();
+  const dispatch = useDispatch();
   const Tabs = ["All", "Publish", "Unpublish"];
   const colors = useColorModeValue(
     ["white", "white", "white"],
     ["black", "green", "yellow.200"]
   );
-  const state= useSelector(state=>state)
-console.log('state',state?.pageReducer?.pages)
+  const [filterArray, setFilterArray] = React.useState([]);
+  const state = useSelector((state) => state);
+  const [allpages, setAllPages] = React.useState(null);
   const [tabIndex, setTabIndex] = React.useState(0);
   const { currentLangData } = React.useContext(LangContext);
   const [isMobile] = useMediaQuery("(max-width: 768px)");
-  const bg = colors[tabIndex];
   const [selectedTab, setSelectedTab] = React.useState("All");
-  const [name,setName]=React.useState('')
-  const [value ,setValue]=React.useState('')
-  const [forms,setForms]=React.useState(state?.pageReducer?.pages)
-  const filter = (e) => {
-    const keyword = name.target.value;
-
-    if (keyword !== '') {
-      const results =pageList.filter((user) => {
-        return user.displayName.toLowerCase().startsWith(keyword.toLowerCase());
+  const [name, setName] = React.useState("");
+   const history=useHistory()
+  const filter = () => {
+    let keyword = name;
+    if (keyword !== "") {
+      const results =  allpages.filter((user) => {
+        return user.pageName.toLowerCase().startsWith(keyword.toLowerCase());
         // Use the toLowerCase() method to make it case-insensitive
       });
-      setForms(results);
+      setFilterArray(results);
     } else {
-      setForms(pageList);
       // If the text field is empty, show all users
+      setFilterArray("");
     }
 
     setName(keyword);
   };
-  console.log('results',forms)
+
+  const getAllPages = () => {
+    apiManager
+      .get("getAllPages")
+      .then((response) => {
+        if (response.message === 6575) {
+          setAllPages(response.result.docs);
+          dispatch(allActions.pageAction.setAllPages(response.result.docs))
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const updatePageStatus = (pageId, status) => {
+    console.log("pageId", status);
+    let _pageId = {
+      pageId: pageId,
+      status: status,
+    };
+    apiManager
+      .post("updatePageStatus", _pageId)
+      .then((response) => {
+        if (response.message === 6575) {
+          getAllPages();
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  React.useEffect(() => {
+    console.log("state?.pageReducer?.allpages",state?.pageReducer.allPages);
+    getAllPages();
+    setAllPages(state?.pageReducer?.allpages)
+
+  },[]);
 
   const renderSearchbarFlex = () => {
     return (
       <Flex
-      width={"100%"}
-      height={"20vh"}
-      flexDirection={"column"}
-      justifyContent={"center"}
-      borderBottomWidth={4}
-      backgroundColor={"white"}
+        width={"100%"}
+        height={"20vh"}
+        flexDirection={"column"}
+        justifyContent={"center"}
+        borderBottomWidth={4}
+        backgroundColor={"white"}
         // padding={5}
       >
         <Flex alignItems={"center"} padding={5}>
           <Text fontWeight={"bold"} fontSize={"20px"}>
             Page List
           </Text>
-          <Button
+          {/* <Button
             title={"Add New Form"}
             marginLeft={"5"}
             color={"white"}
             height={"30px"}
+            onClick={()=>history.push('AddPageInformation')}
             backgroundColor={theme.customColors.masterpanelColors[100]}
           >
             <Text fontSize={"xs"}>Add New Page</Text>
-          </Button>
+          </Button> */}
         </Flex>
         <Flex padding={5} alignItems={"center"}>
-          <Input onClick={(e)=>setName(e)} placeholder={'search Form'} width={"35%"} />
+          <Input
+            width={"35%"}
+            placeholder={"search Form"}
+            onChange={(e) => setName(e.target.value)}
+          />
           <Button
             color={"white"}
             marginLeft={"5"}
             height={"30px"}
             title={"Search"}
-            onClick={()=>filter()}
+            isDisabled={allpages ? false :true}
+            onClick={() => filter()}
             backgroundColor={theme.customColors.masterpanelColors[100]}
           >
             Search
@@ -92,14 +137,34 @@ console.log('state',state?.pageReducer?.pages)
       </Flex>
     );
   };
+  
 
   const renderTabsData = (selectedTab) => {
     return {
-      All: <All clients={forms} page={"12"} />,
-      Publish: <Publish clients={forms} page={"12"} />,
-      Unpublish: <Unpublish clients={forms} page={"12"} />,
+      All: (
+        <All
+          page={"12"}
+          clients={filterArray.length > 0 ? filterArray : allpages}
+          onPublishClick={(pageId, status) => updatePageStatus(pageId, status)}
+        />
+      ),
+      Publish: (
+        <Publish
+          page={"12"}
+          clients={filterArray.length > 0 ? filterArray : allpages}
+          onPublishClick={(pageId, status) => updatePageStatus(pageId, status)}
+        />
+      ),
+      Unpublish: (
+        <Unpublish
+          page={"12"}
+          clients={filterArray.length > 0 ? filterArray : allpages}
+          onPublishClick={(pageId, status) => updatePageStatus(pageId, status)}
+        />
+      ),
     }[selectedTab];
   };
+
   const renderTitle = (tab) => {
     return {
       Procress: currentLangData.app.procressProduction,
@@ -111,54 +176,50 @@ console.log('state',state?.pageReducer?.pages)
   return (
     //     <Suspense>
     <>
-    <Flex height={"100vh"} flexDirection={"column"} width={"100%"} padding={5}
-    backgroundColor={"white"}
-    >
-      {renderSearchbarFlex()}
-      {/* {RenderTabView()} */}
-
       <Flex
-        flexDirection={isMobile ? "column" : "row"}
-      {...styles.buttonContainer}
-        padding={3}
+        height={"100vh"}
+        flexDirection={"column"}
+        width={"100%"}
+        padding={5}
+        backgroundColor={"white"}
       >
-        {Tabs.map((item, index) => {
-          let selected = item === selectedTab;
-          return (
-            <Button
-              backgroundColor={selected ? "#60c9ca" : ""}
-              onClick={() => setSelectedTab(item)}
-              {...styles.tabButton}
-              key={index}
-              color={selected ? "white" : "black"}
-              fontSize={"10px"}
-            >
-              {item}
-            </Button>
-          );
-        })}
-      </Flex>
-      {selectedTab != "All" ? (
-        <Flex {...styles.multiFlex}>
-          <Text {...styles.ppLabel}>{renderTitle(selectedTab)}</Text>
-        </Flex>
-      ) : (
-        <Flex {...styles.multiFlex}>
-          <Text {...styles.ppLabel}>{renderTitle(selectedTab)}</Text>
-        </Flex>
-      )}
+        {renderSearchbarFlex()}
+        {/* {RenderTabView()} */}
 
-      {renderTabsData(selectedTab)}
-  
-    </Flex>
-    {/* <div style={{backgroundColor:"red"}} w={'100%'}>
-    <Pagination
-          pageSize={2}
-          items={formList}
-          onChangePage={()=>alert()}
-        />
-    </div> */}
-</>
+        <Flex
+          flexDirection={isMobile ? "column" : "row"}
+          {...styles.buttonContainer}
+          padding={3}
+        >
+          {Tabs.map((item, index) => {
+            let selected = item === selectedTab;
+            return (
+              <Button
+                backgroundColor={selected ? "#60c9ca" : ""}
+                onClick={() => setSelectedTab(item)}
+                {...styles.tabButton}
+                key={index}
+                color={selected ? "white" : "black"}
+                fontSize={"10px"}
+              >
+                {item}
+              </Button>
+            );
+          })}
+        </Flex>
+        {selectedTab != "All" ? (
+          <Flex {...styles.multiFlex}>
+            <Text {...styles.ppLabel}>{renderTitle(selectedTab)}</Text>
+          </Flex>
+        ) : (
+          <Flex {...styles.multiFlex}>
+            <Text {...styles.ppLabel}>{renderTitle(selectedTab)}</Text>
+          </Flex>
+        )}
+
+        {renderTabsData(selectedTab)}
+      </Flex>
+    </>
   );
 };
 export default PagesList;

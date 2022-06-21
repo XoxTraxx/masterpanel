@@ -66,7 +66,7 @@ export const RenderDropContent = () => {
     <Flex
       {...styles.dropZoneContainer}
       width={isMobile ? "100%" : "100%"}
-      width={"100%"}
+      // width={"100%"}
     >
       <Dropzone
         inputContent={renderInsideDropzone()}
@@ -147,7 +147,7 @@ export const RenderMarginPaddingFlex = () => {
       <Flex
         flexDirection={"column"}
         flex={1}
-        flexDirection={"column"}
+        // flexDirection={"column"}
         justifyContent={"space-between"}
         alignItems={"space-evenly"}
         // padding={3}
@@ -172,3 +172,130 @@ export const RenderMarginPaddingFlex = () => {
     </Flex>
   );
 };
+
+// export const gettingMetaDataBucket = () => {
+//   huawieUpload.obsClient.getBucketMetadata(
+//     {
+//       Bucket: "trax-media",
+//     },
+//     function (err, result) {
+//       if (err) {
+//         console.error("Error-->" + err);
+//       } else {
+//         if (result.CommonMsg.Status < 300) {
+//           console.log("RequestId-->" + result.InterfaceResult.RequestId);
+//           console.log(
+//             "StorageClass-->" + result.InterfaceResult.StorageClass
+//           );
+//           console.log("Location-->" + result.InterfaceResult.Location);
+//         } else {
+//           console.log("Status-->" + result.CommonMsg.Status);
+//         }
+//       }
+//     }
+//   );
+// };
+
+// export const gettingBucletInfo = () => {
+//   huawieUpload.obsClient.getBucketStorageInfo(
+//     {
+//       Bucket: bucketName,
+//     },
+//     function (err, result) {
+//       if (err) {
+//         console.error("Error-->" + err);
+//       } else {
+//         if (result.CommonMsg.Status < 300) {
+//           console.log("RequestId-->" + result.InterfaceResult.RequestId);
+//           console.log("Size-->" + result.InterfaceResult.Size);
+//           console.log(
+//             "ObjectNumber-->" + result.InterfaceResult.ObjectNumber
+//           );
+//         } else {
+//           console.log("Code-->" + result.CommonMsg.Code);
+//           console.log("Message-->" + result.CommonMsg.Message);
+//         }
+//       }
+//     }
+//   );
+// };
+
+// export const gettingBucketACL = () => {
+//   huawieUpload.obsClient.getBucketAcl(
+//     {
+//       Bucket: bucketName,
+//     },
+//     function (err, result) {
+//       if (err) {
+//         console.error("Error-->" + err);
+//       } else {
+//         if (result.CommonMsg.Status < 300) {
+//           console.log("RequestId-->" + result.InterfaceResult.RequestId);
+//           console.log("Owner[ID]-->" + result.InterfaceResult.Owner.ID);
+//           console.log("Grants:");
+//           for (var i = 0; i < result.InterfaceResult.Grants.length; i++) {
+//             console.log("Grant[" + i + "]:");
+//             console.log(
+//               "Grantee[ID]-->" +
+//                 result.InterfaceResult.Grants[i]["Grantee"]["ID"]
+//             );
+//             console.log(
+//               "Grantee[URI]-->" +
+//                 result.InterfaceResult.Grants[i]["Grantee"]["URI"]
+//             );
+//             console.log(
+//               "Permission-->" + result.InterfaceResult.Grants[i]["Permission"]
+//             );
+//           }
+//         } else {
+//           console.log("Code-->" + result.CommonMsg.Code);
+//           console.log("Message-->" + result.CommonMsg.Message);
+//         }
+//       }
+//     }
+//   );
+// };
+
+// export const gettingListObject = () => {
+//   huawieUpload.obsClient.listObjects(
+//     {
+//       Bucket: bucketName,
+//       Prefix: "prefix",
+//       MaxKeys: 100,
+//     },
+//     function (err, result) {
+//       if (err) {
+//         console.error("Error-->" + err);
+//       } else {
+//         if (result.CommonMsg.Status < 300) {
+//           console.log("RequestId-->" + result.InterfaceResult.RequestId);
+//           for (var j = 0; j < result.InterfaceResult.Contents.length; j++) {
+//             console.log("Contents[" + j + "]:");
+//             console.log("Key-->" + result.InterfaceResult.Contents[j]["Key"]);
+//             console.log(
+//               "LastModified-->" +
+//                 result.InterfaceResult.Contents[j]["LastModified"]
+//             );
+//             console.log(
+//               "ETag-->" + result.InterfaceResult.Contents[j]["ETag"]
+//             );
+//             console.log(
+//               "Size-->" + result.InterfaceResult.Contents[j]["Size"]
+//             );
+//             console.log(
+//               "Owner[ID]-->" +
+//                 result.InterfaceResult.Contents[j]["Owner"]["ID"]
+//             );
+//             console.log(
+//               "StorageClass-->" +
+//                 result.InterfaceResult.Contents[j]["StorageClass"]
+//             );
+//           }
+//         } else {
+//           console.log("Code-->" + result.CommonMsg.Code);
+//           console.log("Message-->" + result.CommonMsg.Message);
+//         }
+//       }
+//     }
+//   );
+// };

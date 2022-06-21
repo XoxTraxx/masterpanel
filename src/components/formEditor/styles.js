@@ -526,10 +526,12 @@ const styles = {
   },
   btnGroup: {
     size: "xs",
+    padding: 2,
+    spacing: "6",
     color: "white",
     variant: "outline",
-    spacing: "6",
-    padding: 2,
+    height:"40px",
+    width:"100px"
   },
 };
 export default styles;

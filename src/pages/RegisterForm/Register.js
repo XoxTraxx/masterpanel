@@ -4,18 +4,20 @@ import styles from "../../components/registerComponent/styles";
 import Dropzone from "react-dropzone-uploader";
 import ReCAPTCHA from "react-google-recaptcha";
 import ApiManager from "../../config/apiManager";
+import { Progress } from '@chakra-ui/react'
 import "react-dropzone-uploader/dist/styles.css";
 import {
   renderDropdown,
-  handleChangeStatus,
   renderInsideDropzone,
 } from "../../components/registerComponent/renderFunction";
+import { BiCloudUpload } from "react-icons/bi";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import LangContext from "../../context/languageContext";
 import { uploadImage } from "../../config/imageUploader";
 import TraxImage from "../../components/image/Trax-background-06.png";
 import SelectCountries from "../../components/selectCountries/selectCountries";
 import { renderFields } from "../../components/registerComponent/renderFunction";
-
+import { RiArrowDownSFill } from "react-icons/ri";
 import {
   Box,
   Text,
@@ -25,6 +27,19 @@ import {
   SimpleGrid,
   useMediaQuery,
   useColorModeValue,
+  InputGroup,
+  InputRightElement,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Image,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
+  CloseButton,
+  Center
 } from "@chakra-ui/react";
 import { useHistory, useLocation } from "react-router-dom";
 
@@ -35,24 +50,26 @@ const Register = () => {
 
   let ProdService = ["Product", "Service"];
   const [isMobile] = useMediaQuery("(max-width: 768px)");
-
+  const location = useLocation();
+  let subscriptionData = location?.state?.data;
+  const [industry, setIndustry] = useState([]);
+  const [selectedFiles, setSelecteFiles] = useState([]);
+  const [singleindustry, setSingleIndustry] = useState(subscriptionData?.industry?subscriptionData?.industry:'');
   let initValue = {
     url: "",
-    name: "",
-    email: "",
-    others: "",
-    phone: "",
-    industry: "",
-    password: "",
-    userName: "",
-    subIndustry: "",
+    name: subscriptionData?.name ?subscriptionData?.name:'',
+    email: subscriptionData?.email ?subscriptionData?.email:'',
+    others: subscriptionData?.others ?subscriptionData?.others:'',
+    industry: singleindustry,
+    password: subscriptionData?.password ?subscriptionData?.password:'',
+    userName: subscriptionData?.name ?subscriptionData?.name:'',
     yourPosition: "",
-    companyName: "",
-    productService: "",
-    companyPhone: "",
-    companyAddress: "",
+    companyName: subscriptionData?.companyName ?subscriptionData?.companyName:'',
+    product: subscriptionData?.product ?subscriptionData?.procressProduction:'',
+    companyPhone: subscriptionData?.companyPhoneNumber ?subscriptionData?.companyPhoneNumber:'',
+    companyAddress: subscriptionData?.companyAddress ?subscriptionData?.companyAddress:'',
     uploadCompanyForms: "",
-    companyRegisterationNo: "",
+    companyRegisterationNo: subscriptionData?.companyRegistrationNumber ?subscriptionData?.companyRegistrationNumber:'',
   };
 
   let mandatoryFields = {
@@ -61,15 +78,14 @@ const Register = () => {
   };
 
   let history = useHistory();
-  const location = useLocation();
-  let subscriptionData = location?.state?.data;
-  console.log("PreviewData=>", subscriptionData);
-
+  console.log("PreviewData=>");
+  const [allfieldsError, setAllFieldsError] = useState("");
   const [error, setError] = useState("");
   const [show, setShow] = useState("");
-  const [industry, setIndustry] = useState([]);
+  const [showOthers, setShowOthers] = useState(false);
   const [message, setMessage] = useState("");
   const [value, setValue] = useState(initValue);
+  const [showProgress, setProgress] = useState(false);
   const [loading, setLoading] = useState(false);
   const apimanager = ApiManager.getInstance();
   const [errCheck, setErrCheck] = useState(false);
@@ -86,7 +102,7 @@ const Register = () => {
   const [phoneTurnRed, setPhoneTurnRed] = useState(false);
   const [disabledSubmit, setDisabledSubmit] = useState(false);
   const [emailDuplication, setEmailDuplication] = useState("");
-  const [countryCodeValue, setCountryCodeValue] = useState("");
+  const [countryCodeValue, setCountryCodeValue] = useState(subscriptionData?.companyCountryCode ?subscriptionData?.companyCountryCode:'');
   const [phoneCountryCode, setPhoneCountryCode] = useState("");
 
   const handleonChange = (evt, key) => {
@@ -95,26 +111,43 @@ const Register = () => {
       ...value,
       [key]: ev,
     });
+    console.log(ev, "Fields", value);
   };
 
-  const handleSubmit = async (files, allFiles) => {
-    console.log(files, "handleSubmit", allFiles);
+  const handleChangeStatus = ({ meta,file }, status) => {
+    console.log('file is',meta);
+    
+    
+  };
+
+  const handleSubmit = async () => {
+    let allFiles = selectedFiles
+    console.log('allFiles.lenght', allFiles.length)
+    if(!allFiles.length){
+      submitContinue()
+    }
+    else{
     for (let index = 0; index < allFiles.length; index++) {
+      setProgress(true)
       console.log("data", allFiles[index]);
-      await uploadImage(allFiles[index].file)
+      await uploadImage(allFiles[index])
         .then((res) => {
           // setS3UploadSuccess(true);
           console.log("res is", res.location);
           let image = [];
-
           image.push(res.location);
           s3ImagesData.push(res.location);
           console.log("s3IMageData", s3ImagesData);
           // setShow(false);
+          if(s3ImagesData.length === allFiles.length){
+            submitContinue()
+            setProgress(false)
+          }
         })
         .catch((error) => {
           console.log("error", error);
         });
+    }
     }
   };
 
@@ -151,8 +184,13 @@ const Register = () => {
   const textColor = useColorModeValue("white", "black");
 
   // Event funtions //
-
+  const onChange = (e) => {
+    console.log(e.target.files);
+    setSelecteFiles(e.target.files)
+  };
   const submitContinue = () => {
+    console.log('value',value)
+    console.log('subscriptionData',subscriptionData)
     setLoading(true);
 
     let ifError = false;
@@ -172,6 +210,7 @@ const Register = () => {
 
     if (ifError) {
       setError(currentLangData.app.mandatoryFieldsRequired + "ifError");
+      console.log("error is", ifError);
       setTimeout(() => {
         setError(null);
         setLoading(false);
@@ -187,7 +226,7 @@ const Register = () => {
         setTimeout(() => {
           setError(null);
         }, []);
-        console.log("noError");
+        console.log("noError", noError);
         // setError("Something went wrong");
       } else {
         let body = {
@@ -204,8 +243,6 @@ const Register = () => {
           companyRegistrationNumber: value["companyRegisterationNo"]
             ? value["companyRegisterationNo"]
             : subscriptionData?.companyRegistrationNumber,
-
-          phone: value["phone"] ? value["phone"] : subscriptionData?.phone,
 
           countryCode: parseInt(phoneCountryCode)
             ? parseInt(phoneCountryCode)
@@ -229,19 +266,17 @@ const Register = () => {
               : industry[0]
             : subscriptionData?.industry,
 
-          subIndustry: (
-            value["subIndustry"] ? value["subIndustry"] : subIndustry[0]
-          )
-            ? value["subIndustry"]
-              ? value["subIndustry"]
-              : subIndustry[0]
-            : subscriptionData?.subIndustry,
+          // subIndustry: (
+          //   value["subIndustry"] ? value["subIndustry"] : subIndustry[0]
+          // )
+          //   ? value["subIndustry"]
+          //     ? value["subIndustry"]
+          //     : subIndustry[0]
+          //   : subscriptionData?.subIndustry,
 
           others: value["others"] ? value["others"] : subscriptionData?.others,
 
-          product: value["productService"]
-            ? value["productService"]
-            : ProdService[0],
+          product: value["product"] ? value["product"] : ProdService[0],
 
           email: value["email"] ? value["email"] : subscriptionData?.email,
           // url: value["url"],
@@ -275,7 +310,7 @@ const Register = () => {
           stages: subscriptionData?.stages,
           AdminCompanyPosition: subscriptionData?.AdminCompanyPosition,
           trackingBased: subscriptionData?.trackingBased,
-          product: subscriptionData?.product,
+          // product: subscriptionData?.product,
           department: subscriptionData?.department,
           // image:
           //   "https://s3.ap-southeast-1.amazonaws.com/likwid-media/1610105987735.jpeg",
@@ -288,8 +323,8 @@ const Register = () => {
         setMessage("Continue Registered Form, Please wait...");
 
         // window.localStorage.setItem("Register1 data", JSON.stringify(body));
-        // console.log("JSON.stringify(body)", JSON.stringify(body));
-
+        console.log("JSON.stringify(body)", JSON.stringify(body));
+        //  console.log(object)
         setTimeout(() => {
           setMessage(null);
           // setValue(initValue);
@@ -323,6 +358,25 @@ const Register = () => {
             tempIndustryArray.push(value?.industryName);
           });
           setIndustry(tempIndustryArray);
+        }
+      })
+      .catch((error) => {
+        console.log("error", error);
+      });
+  };
+
+  const addIndustry = () => {
+    let body = {
+      industryName: value["others"],
+    };
+    apimanager
+      .post("addIndustry", body)
+      .then((response) => {
+        if (response.message === 6470) {
+          console.log('singleIndust',addIndustry)
+          setSingleIndustry(value["others"])
+          setShowOthers(false)
+          getIndustries();
         }
       })
       .catch((error) => {
@@ -415,8 +469,8 @@ const Register = () => {
         });
       })
       .catch((error) => {
-            setLoading(loading);
-            console.log("checkValidation", error);
+        setLoading(loading);
+        console.log("checkValidation", error);
         return false;
       });
   };
@@ -437,38 +491,94 @@ const Register = () => {
   };
 
   const checkMandatoryFields = () => {
-    if (
-      validator.isEmpty(
-        // value["userName"]
-        //   ? value["userName"]
-        //   : subscription?.name
-        utilityFunctionOfValue({
-          string: value["userName"],
-          subString: subscriptionData?.name,
-        }) &&
-          utilityFunctionOfValue({
-            string: value["email"],
-            subString: subscriptionData?.email,
-          }) &&
-          utilityFunctionOfValue({
-            string: value["password"],
-            subString: subscriptionData?.password,
-          }) &&
-          utilityFunctionOfValue({
-            string: countryCodeValue,
-            subString: subscriptionData?.companyCountryCode,
-          }) &&
-          utilityFunctionOfValue({
-            string: phoneCountryCode,
-            subString: subscriptionData?.countryCode,
-          }) &&
-          utilityFunctionOfValue({
-            string: value["companyPhone"],
-            subString: subscriptionData?.companyPhoneNumber,
-          })
-      )
-    ) {
-      setFeildsError(currentLangData.app.mandatoryFieldsRequired);
+    // if (
+    //   validator.isEmpty(
+    //     // value["userName"]
+    //     //   ? value["userName"]
+    //     //   : subscription?.name
+    //     utilityFunctionOfValue({
+    //       string: value["userName"],
+    //       subString: subscriptionData?.name,
+    //     }) ||
+    //       utilityFunctionOfValue({
+    //         string: value["email"],
+    //         subString: subscriptionData?.email,
+    //       }) ||
+    //       utilityFunctionOfValue({
+    //         string: value["password"],
+    //         subString: subscriptionData?.password,
+    //       }) ||
+    //       utilityFunctionOfValue({
+    //         string: countryCodeValue,
+    //         subString: subscriptionData?.companyCountryCode,
+    //       }) ||
+    //       utilityFunctionOfValue({
+    //         string: value["companyPhone"],
+    //         subString: subscriptionData?.companyPhoneNumber,
+    //       })
+    //   )
+    // ) {
+    //   setFeildsError(currentLangData.app.mandatoryFieldsRequired);
+    //   setAllFieldsError(currentLangData.app.mandatoryFieldsRequired)
+    //   console.log(feildsError);
+    //   timerForError({
+    //     fieldErr: null,
+    //     errChec: false,
+    //   });
+    //   return false;
+    // }
+    // if (
+    //   value["email"] === "" &&
+    //   value["userName"] === "" &&
+    //   value["password"] === "" &&
+    //   countryCodeValue === "" &&
+    //   value["companyPhone"]
+    // ) {
+    //   // setFeildsError(currentLangData.app.mandatoryFieldsRequired);
+    //   setAllFieldsError(currentLangData.app.mandatoryFieldsRequired);
+    //   console.log(value);
+    //     timerForError({
+    //       fieldErr: null,
+    //       errChec: false,
+    //     });
+    //     alert("error");
+    //     return false;
+    // }
+    if (value["email"] === "") {
+      setAllFieldsError(currentLangData.app.mandatoryFieldsRequired);
+      console.log(value);
+      timerForError({
+        fieldErr: null,
+        errChec: false,
+      });
+      return false;
+    } else if (value["userName"] === "") {
+      setAllFieldsError(currentLangData.app.mandatoryFieldsRequired);
+      console.log(value);
+      timerForError({
+        fieldErr: null,
+        errChec: false,
+      });
+      return false;
+    } else if (value["password"] === "") {
+      setAllFieldsError(currentLangData.app.mandatoryFieldsRequired);
+      console.log(value);
+      timerForError({
+        fieldErr: null,
+        errChec: false,
+      });
+      return false;
+    } else if (value["companyPhone"] === "") {
+      setAllFieldsError(currentLangData.app.mandatoryFieldsRequired);
+      console.log(value);
+      timerForError({
+        fieldErr: null,
+        errChec: false,
+      });
+      return false;
+    } else if (countryCodeValue === "") {
+      setAllFieldsError(currentLangData.app.mandatoryFieldsRequired);
+      console.log(value);
       timerForError({
         fieldErr: null,
         errChec: false,
@@ -484,7 +594,8 @@ const Register = () => {
         11
       )
     ) {
-      setFeildsError(currentLangData.app.companyPhoneRange8to9);
+      // setFeildsError(currentLangData.app.companyPhoneRange8to9);
+      setAllFieldsError(currentLangData.app.companyPhoneRange8to9);
       timerForError({
         fieldErr: null,
         errChec: false,
@@ -498,7 +609,8 @@ const Register = () => {
         })
       )
     ) {
-      setFeildsError(currentLangData.app.wrongEmail);
+      // setFeildsError(currentLangData.app.wrongEmail);
+      setAllFieldsError(currentLangData.app.wrongEmail);
       timerForError({
         fieldErr: null,
         errChec: false,
@@ -513,22 +625,7 @@ const Register = () => {
       )
     ) {
       setFeildsError(currentLangData.app.validPhone);
-      timerForError({
-        fieldErr: null,
-        errChec: false,
-      });
-      return false;
-    } else if (
-      !validator.isLength(
-        utilityFunctionOfValue({
-          string: value["phone"],
-          subString: subscriptionData?.phone,
-        }),
-        8,
-        11
-      )
-    ) {
-      setFeildsError(currentLangData.app.phoneRange8to9);
+      setAllFieldsError(currentLangData.app.validPhone);
       timerForError({
         fieldErr: null,
         errChec: false,
@@ -550,7 +647,8 @@ const Register = () => {
         }
       )
     ) {
-      setFeildsError(currentLangData.app.validPass);
+      // setFeildsError(currentLangData.app.validPass);
+      setAllFieldsError(currentLangData.app.validPass);
       timerForError({
         fieldErr: null,
         errChec: false,
@@ -558,6 +656,7 @@ const Register = () => {
       return false;
     } else {
       return true;
+      setAllFieldsError("");
     }
   };
 
@@ -587,6 +686,18 @@ const Register = () => {
         <Text {...styles.txtRegistered} paddingLeft={isMobile ? 5 : 0}>
           {currentLangData.app.registerationHeading}
         </Text>
+        {allfieldsError ? (
+          <Alert variant="solid" status="error">
+            <AlertIcon />
+            {allfieldsError}
+            <CloseButton
+              onClick={() => setAllFieldsError("")}
+              position="absolute"
+              right="8px"
+              top="8px"
+            />
+          </Alert>
+        ) : null}
         <Flex {...styles.flexTextBold}>
           <Flex {...styles.mainFormFlex} paddingX={isMobile ? 5 : 0}>
             {renderFields({
@@ -657,10 +768,10 @@ const Register = () => {
                 },
               })}
 
-              {renderDropdown({
+              {/* {renderDropdown({
                 placeholder: "",
                 title: "Industry",
-                addSubIndustry: true,
+                addSubIndustry: false,
                 multiMapping: industry,
                 subTitle: "Sub-Industry",
                 subMultiMapping: subIndustry,
@@ -676,17 +787,59 @@ const Register = () => {
                     industry: k.target.value,
                   }));
                 },
-              })}
-
-              {renderFields({
-                title: "Others (Please specify)",
-                value: value["others"]
-                  ? value["others"]
-                  : subscriptionData?.others,
-                onChange: (evt) => {
-                  handleonChange(evt, "others");
-                },
-              })}
+              })} */}
+              <Flex flexDirection={'column'}>
+                <Text ml={2}>Industry</Text>
+              <Menu>
+                <MenuButton
+                  fontWieght={"normal"}
+                  textAlign={"left"}
+                  fontSize={"small"}
+                  rightIcon={<RiArrowDownSFill />}
+                  as={Button}
+                  mt={4}
+                >
+                  <Text>
+                    {singleindustry ? singleindustry : "Select Industry"}{" "}
+                  </Text>
+                </MenuButton>
+                <MenuList>
+                  {industry.map((item, index) => {
+                    return (
+                      <MenuItem onClick={() => setSingleIndustry(item)}>
+                        {item}
+                      </MenuItem>
+                    );
+                  })}
+                  <MenuItem onClick={() =>{ setShowOthers(true);setSingleIndustry('')}}>
+                    Others
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+               </Flex>
+              {showOthers && singleindustry === '' ? (
+                <Flex mt={1}>
+                  {" "}
+                  {renderFields({
+                    title: "Others (Please specify)",
+                    // value: value["others"]
+                    //   ? value["others"]
+                    //   : subscriptionData?.others,
+                    onChange: (evt) => {
+                      handleonChange(evt, "others");
+                    },
+                  })}
+                  <Button
+                    onClick={() => addIndustry()}
+                    ml={3}
+                    w={"150px"}
+                    mt={8}
+                  >
+                    {" "}
+                    Add +
+                  </Button>
+                </Flex>
+              ) : null}
 
               {renderDropdown({
                 height: 10,
@@ -696,14 +849,14 @@ const Register = () => {
                 onChange: (k) => {
                   setValue((prev) => ({
                     ...prev,
-                    productService: k.target.value,
+                    product: k.target.value,
                   }));
                 },
               })}
 
               <Box {...styles.firstGrid}></Box>
 
-              {renderFields({
+              {/* {renderFields({
                 type: "tel",
                 maxLength: 11,
                 mandatory: true,
@@ -723,7 +876,7 @@ const Register = () => {
                 onChange: (evt) => {
                   handleonChange(evt, "phone");
                 },
-              })}
+              })} */}
 
               {renderFields({
                 title: "URL",
@@ -792,27 +945,34 @@ const Register = () => {
                     {currentLangData.app.password}
                   </Text>
                 </Flex>
-
-                <Input
-                  {...styles.passwordInput}
-                  type={show ? "text" : "password"}
-                  value={
-                    value["password"]
-                      ? value["password"]
-                      : subscriptionData?.password
-                  }
-                  onChange={(evt) => handleonChange(evt, "password")}
-                ></Input>
+                <InputGroup>
+                  <Input
+                    {...styles.passwordInput}
+                    type={show ? "text" : "password"}
+                    value={
+                      value["password"]
+                        ? value["password"]
+                        : subscriptionData?.password
+                    }
+                    onChange={(evt) => handleonChange(evt, "password")}
+                  ></Input>
+                  <InputRightElement width="4.5rem">
+                    {show ? (
+                      <AiFillEyeInvisible
+                        onClick={() => setShow(!show)}
+                        size={22}
+                        cursor={"pointer"}
+                      />
+                    ) : (
+                      <AiFillEye
+                        cursor={"pointer"}
+                        onClick={() => setShow(!show)}
+                        size={22}
+                      />
+                    )}
+                  </InputRightElement>
+                </InputGroup>
               </Flex>
-              <Button
-                {...styles.hideShowBtn}
-                color={textColor}
-                alignSelf={"center"}
-                onClick={handleClick}
-                background={buttonBackgroundColor}
-              >
-                <Text fontSize="8px">{show ? "Hide" : "Show"}</Text>
-              </Button>
             </Flex>
           </Flex>
           <Flex {...styles.uploadCompany}>
@@ -822,18 +982,18 @@ const Register = () => {
             </Text>
           </Flex>
           <Flex {...styles.uploadAttachments}>
-            <Dropzone
-              onSubmit={handleSubmit}
+            {/* <Dropzone
+              //  onSubmit={handleSubmit}
               getUploadParams={getUploadParams}
               onChangeStatus={handleChangeStatus}
               inputContent={renderInsideDropzone()}
               styles={{
                 dropzone: {
                   // padding: "10px",
-                  minWidth: "60px",
+                  minWidth: "100%",
                   maxWidth: "150px",
-                  minHeight: "120px",
-                  maxHeight: "150px",
+                  minHeight: "200px",
+                  maxHeight: "200px",
                   borderRadius: "20px",
                   borderColor: "transparent",
                   scrollbarColor: "#03eded",
@@ -852,7 +1012,12 @@ const Register = () => {
                   borderRadius: "24px",
                 },
               }}
-            ></Dropzone>
+            ></Dropzone> */}
+            <Box paddingY={50} h={'150px'}>
+              <Center>
+                <Input   onChange={onChange} padding={1} borderWidth={1} type="file" multiple  />
+              </Center>
+              </Box>
           </Flex>
           {/* <Flex justifyContent={"center"} marginY={2}>
               <ReCAPTCHA
@@ -880,12 +1045,12 @@ const Register = () => {
           <Text {...styles.errorMsg} color="green">
             {message}
           </Text>
-
+         {showProgress? <Progress colorScheme='green' mt={3}  isIndeterminate value={80} /> :null}
           <Button
             {...styles.btnContinue}
             // isLoading={loading}
             // isDisabled={disabledSubmit}
-            onClick={() => submitContinue()}
+            onClick={() => handleSubmit()}
           >
             <Text color={"white"}>{currentLangData.app.continue}</Text>
           </Button>
@@ -895,3 +1060,4 @@ const Register = () => {
   );
 };
 export default Register;
+

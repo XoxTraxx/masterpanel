@@ -1,24 +1,40 @@
-import React from 'react'
-import { Parser } from 'html-to-react'
+import React from "react";
+import { Helmet } from "react-helmet";
+import HtmlParser from "react-html-parser";
+export default function ReactTemplate({ html, path, css, meta ,seo}) {
+  let aray = [];
+  const IFame = () => {
+    let dataCss = css;
+    let data = html;
+    return {
+      __html: data,
+      __css: dataCss,
+    };
+  };
 
-export default function ReactTemplate({html,path}) {
-  const rawHTML = `
-  <div>
-    <h1>The Second Example</h1>
-    <p>The <strong>rat</strong> hates the <strong>cat</strong></p>
-    <p><i>This is something special</i></p>
-    <hr/>  
-    <div>
-      <img src="https://www.kindacode.com/wp-content/uploads/2021/06/pi-2.jpeg" width="1000"/>
-    </div>
-    <hr/>  
-    <h4>Just Another Heading</h4>
-  </div>
-  `;
-  
+  React.useEffect(() => {
+    let dataCss = css;
+    const allClasses = document.getElementsByClassName(dataCss);
+    for (var i = 0, len = allClasses.length; i < len; i++) {
+      aray.push(allClasses[i]);
+    }
+  }, []);
+  console.log('jeelo check', IFame().__html);
+
   return (
-    <div >
-
-    </div>
-  )
+    <html>
+      <head>
+        <title>Server Rendered App</title>
+        <style>{IFame().__css}</style>
+      </head>
+      <body>
+        {HtmlParser(IFame().__html)}
+        <script src="/build/client.entry.js" />
+        <Helmet>
+          <meta name={meta?.name} content={meta?.description}></meta>
+          <meta name={seo?.name} content={seo?.description}></meta>
+        </Helmet>
+      </body>
+    </html>
+  );
 }

@@ -55,16 +55,17 @@
 import firebase from 'firebase/app';
 import 'firebase/messaging';
 const firebaseConfig = {
-  apiKey: "AIzaSyD255oy6q2Vyuj9eAoY4tMIGbGc3NebtSA",
-  authDomain: "trax-5abbd.firebaseapp.com",
-  projectId: "trax-5abbd",
-  storageBucket: "trax-5abbd.appspot.com",
-  messagingSenderId: "930835251839",
-  appId: "1:930835251839:web:b2f93f4541d8f76afab54a",
-  measurementId: "G-YFQKT2VN1K"
+  apiKey: "AIzaSyCQd0K1lzMtprolyot3N9HJtR2hf4UoXEM",
+  authDomain: "trax-cloud-messaging.firebaseapp.com",
+  projectId: "trax-cloud-messaging",
+  storageBucket: "trax-cloud-messaging.appspot.com",
+  messagingSenderId: "790939580320",
+  appId: "1:790939580320:web:50605cb6b22f47c61696c5",
+  measurementId: "G-0BSWK6D81S"
 };
 
 const firbaseApp=firebase.initializeApp(firebaseConfig);
+// const messaging=firebase.messaging()
 export default firbaseApp
 
 // const messaging = firebase.messaging();

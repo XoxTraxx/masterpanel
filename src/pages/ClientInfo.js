@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import allActions from "../actions/allActions";
 import { useLocation } from "react-router-dom";
 import LangContext from "../context/languageContext";
 import ApiManager from "../../src/config/apiManager";
 import ClientsInfo from "../components/Clients/ClientsInfo";
-
+import { useSelector,useDispatch } from "react-redux";
 function ClientInfo() {
   const dispatch = useDispatch();
   const history = useLocation();
@@ -160,10 +159,13 @@ function ClientInfo() {
   };
 
   useEffect(() => {
-    getMerchantDetail();
-    getAdminNotifications()
+    // getMerchantDetail();
+    // getAdminNotifications()
   },[]);
-
+  useEffect(()=>{
+   getMerchantDetail();
+    getAdminNotifications()
+  },[])
   return (
     <React.Fragment>
       <ClientsInfo />

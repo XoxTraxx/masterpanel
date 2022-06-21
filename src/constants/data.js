@@ -26,7 +26,7 @@ const HomeMenu = [
   // { displayName: "Food Safety ",path:'/PageEdit' },
   // { displayName: "Contact" ,path:'/PageEdit'},
   // { displayName: "Register",path:'/PageEdit' },
-   { displayName: "Add New Page " ,path:'/FormEditor'},
+   { displayName: "Add New Page " ,path:'/AddPageInformation'},
    { displayName: "Page List" ,path:'/PageList'},
 ];
 const pageList=[
@@ -39,11 +39,11 @@ const pageList=[
 ]
 const FormMenu=[
   {displayName:'Form List',path:'/formList'},
-  {displayName:'Add New Form',path:'/FormGenerator'},
+  {displayName:'Add New Form',path:'AddPageInformation'},
 ]
  const ClientMenu = [
   {displayName:'Over All',path:'/Clients'},
-  {displayName:'Add New Client',path:'/'},
+  // {displayName:'Add New Client',path:'/undefined'},
   {displayName:'Client List',path:'/clientList'},
 
 ]
@@ -557,6 +557,7 @@ const blockChainData = [
   "It’s a method of recording data – anything that needs recording and verified as happened. Data recorded is tampered proof.",
   "The blockchain traceability creates a smarter and more secure supply chain, tracking supply chain critical events through a clear and solid audit trail with near real-time visibility.",
 ];
+
 const coreAdvantages = [
   {
     image: vector,

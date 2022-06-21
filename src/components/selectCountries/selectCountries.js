@@ -1,6 +1,7 @@
 import { Select } from "@chakra-ui/react";
 import theme from "../../config/color";
 const selectCountries = (props) => {
+  console.log('countryCodeValue',props)
   return (
     <Select
       size={"xs"}
@@ -9,11 +10,11 @@ const selectCountries = (props) => {
       width={props.width}
       variant={props.variant}
       onChange={props.onChange}
-      // defaultValue={countryCodeValue}
+       defaultValue={props.countryCodeValue}
       focusBorderColor={theme.customColors.masterpanelColors[100]}
     >
       <option value="92" hidden>
-        Select Country
+      Select Country
       </option>
       <option data-countrycode="AF" value="93">
         Afghanistan (+93)

@@ -70,7 +70,8 @@ const NotificationDetail = () => {
         ) : (
           <Image w={"200"} src={EmptyItem} />
         )}
-        <Flex {...style.paginationcontainer}>
+        {temp.length == 0 ? null : (
+          <Flex {...style.paginationcontainer}>
           <ReactPaginate
             previousLabel={"Previous"}
             nextLabel={"Next"}
@@ -86,6 +87,8 @@ const NotificationDetail = () => {
             activeClassName={"active"}   
           />
         </Flex>
+        ) }
+        
       </Flex>
     </Flex>
   );

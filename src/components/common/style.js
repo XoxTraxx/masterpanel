@@ -58,7 +58,7 @@ const style = {
     marginTop: 1,
   },
   tabText: {
-    w: "80px",
+    w: "130px",
     marginLeft: 15,
     fontSize: "lg",
     paddingRight: 3,
@@ -128,7 +128,6 @@ const style = {
     width: "100%",
     align: "center",
     color: "gray.600",
-    position: "sticky",
     overflow: "hidden",
     justify: "space-between",
   },

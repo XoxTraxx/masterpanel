@@ -17,8 +17,8 @@ import {
   NumberInputField,
 } from "@chakra-ui/react";
 
-export const handleChangeStatus = ({ meta }, status) => {
-  console.log(status, meta);
+export const handleChangeStatus = ({ meta,file }, status) => {
+  console.log('fil is',file);
 };
 
 export const renderInsideDropzone = () => {
@@ -132,6 +132,7 @@ export const renderFields = ({
   countryCode,
   valueNumber,
   selectCountry,
+  show,
   readOnlyInput,
   defaultValueNumber,
   showSelectCountries,
@@ -252,3 +253,4 @@ export const renderFields = ({
     </Box>
   );
 };
+

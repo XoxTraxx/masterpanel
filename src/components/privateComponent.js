@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useRef} from "react";
 import theme from "../config/color";
 import styles from "./registerComponent/styles2";
 import {
@@ -11,6 +11,9 @@ import {
   Spacer,
   SimpleGrid,
   RadioGroup,
+  Button,
+  InputGroup,
+  InputRightElement,
 } from "@chakra-ui/react";
 
 import LangContext from "../context/languageContext";
@@ -83,6 +86,7 @@ export const RenderFields = ({
   );
 };
 
+ 
 export const renderPhaseQuestions = ({
   firstPlaceholer,
   secondPlaceholder,
@@ -97,7 +101,18 @@ export const renderPhaseQuestions = ({
   value2,
   value3,
   value4,
+  phaseNumber,
+  handleItemChange,
+  onChangeAddFields,
+  onChangedaynamicFields,
+  fields,
+  phaseName,
+  onRemoveField,
+  ref,
+  disable,
+  isDisable
 }) => {
+  console.log('fields',fields)
   return (
     <Flex backgroundColor="#f6f5fa" flex={1} padding={5}>
       <SimpleGrid {...styles.simpleGridFlex} width={"100%"}>
@@ -110,31 +125,37 @@ export const renderPhaseQuestions = ({
             onChange={(evt) => firstonChange && firstonChange(evt)}
           ></Input>
         </Flex>
-
-        <Input
-          {...styles.phaseInputs}
-          value={value2}
-          placeholder={secondPlaceholder}
-          onChange={(evt) => secondonChange && secondonChange(evt)}
-        ></Input>
-
-        <Text></Text>
-
-        <Input
-          value={value3}
-          {...styles.phaseInputs}
-          placeholder={thirdPlaceholder}
-          onChange={(evt) => thirdonChange && thirdonChange(evt)}
-        ></Input>
-
-        <Text></Text>
-
-        <Input
-          {...styles.phaseInputs}
-          value={value4}
-          placeholder={forthPlaceholder}
-          onChange={(evt) => forthonChange && forthonChange(evt)}
-        ></Input>
+       <Flex >
+         <>
+          <Input 
+            type="text" 
+            onkeydown="return /[a-z]/i.test(event.key)" 
+            ref={ref}    
+            placeholder={'Add Field'} 
+            {...styles.phaseInputs} 
+            onChange={(e)=>{
+            handleItemChange(e.target.value,)}
+            }  
+            bg={'white'} />
+           <Button isDisabled={disable} h={'30px'} onClick={()=>onChangeAddFields()}  color={'white'} bg={'#53b1ad'} fontSize={10} padding={3} ml={2}> Add Fields</Button>
+          </>
+        </Flex>    
+        {fields? fields.map((item,index)=>{
+            return <Flex
+                      bg={'#efefef'}  
+                      borderRadius={2} 
+                      borderWidth={1} padding={1} >
+                     <InputGroup> 
+                        <Input placeholder={item.name} onChange ={(event) => onChangedaynamicFields &&onChangedaynamicFields(event.target.value,index,item.name)}   bg={'white'} />
+                        <InputRightElement>
+                          <Button onClick={()=>onRemoveField(item.name,index)}  color={'white'} h={'30px'} bg={"#53b1ad"}  size='sm' >
+                            X
+                          </Button>
+                       </InputRightElement>
+                     </InputGroup>
+                  </Flex>
+                  })
+             :null}
       </SimpleGrid>
     </Flex>
   );

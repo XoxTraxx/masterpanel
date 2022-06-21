@@ -34,7 +34,7 @@ const DateMenu = ({
         onChange={onChange}
         placeholder={placeholder}
         value={value}
-        isSecure={isSecure}
+        // isSecure={isSecure}
         id={id}
         bg={bg ? bg : theme.customColors.gray[900]}
         {...style.dateCustomInput}

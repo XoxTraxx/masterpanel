@@ -39,6 +39,7 @@ const Profile = (props) => {
   let consumer = "Consumer";
   let Clients = "Clients";
   let Forms = "Form";
+  let Complaints = "Complaints";
 
   const state = useSelector((state) => state);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -58,6 +59,7 @@ const Profile = (props) => {
   const dispatch = useAuthDispatch();
   const dipatchMerchant = useDispatch();
   const apimanager = ApiManager.getInstance();
+  
   const getAllClients = () => {
     apimanager
       .get(currentLangData.apis.getAllClients, {})
@@ -123,6 +125,12 @@ const Profile = (props) => {
       // subMenu: state.merchantReducer.merchants,
       // icon: <CgProfile size={26} marginTop={1} />,
     },
+    {
+      tab: "Complaints",
+      path: "/Help",
+      // subMenu: state.merchantReducer.merchants,
+      // icon: <CgProfile size={26} marginTop={1} />,
+    },
   ];
 
   const renderOnClickTabs = (index, tab, bool) => {
@@ -156,6 +164,12 @@ const Profile = (props) => {
       setCurrentPage(tab);
     }
     else if (tab === Forms) {
+      if (tab === pageName) {
+        window?.location?.reload();
+      }
+      setCurrentPage(tab);
+    }
+    else if (tab === Complaints) {
       if (tab === pageName) {
         window?.location?.reload();
       }
@@ -203,7 +217,7 @@ const Profile = (props) => {
                       {...style.subMenuFlex}
                     >
                       {/* <BsFillRecordCircleFill /> */}
-                      <Text {...style.subTabMenu} key={item.menu}>
+                      <Text fontSize={12} {...style.subTabMenu} key={item.menu}>
                         {item.companyName ? item.companyName : item.displayName}
                       </Text>
                       {/* <BiMinusCircle /> */}
@@ -260,7 +274,7 @@ const Profile = (props) => {
                       }}
                     >
                       {item.icon}
-                      <Text {...style.tabText} key={item.tab}>
+                      <Text fontSize={12} {...style.tabText} key={item.tab}>
                         {item.tab}
                       </Text>
                       <Flex {...style.iconContainer}>

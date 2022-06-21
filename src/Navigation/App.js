@@ -1,48 +1,47 @@
 import React, { Suspense } from "react";
-import SlideBar from "../components/common/sidebar";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { Spinner } from "../components/Spinner";
-import ApiManager from "../config/apiManager";
-import { useDispatch, useSelector } from "react-redux";
-import NotificationDetail from "../components/Notification/NotificationDetail";
 // import ClientForm from '../pages/ClientForm'
-import ReactTemplate from "../pages/ReactTemplate";
+import Help from '../pages/Help'
+import HomeScreen  from '../pages/Home'
+import FormList from '../pages/FormList'
+import  Preview from  "../pages/Preview";
+import  PageList from  "../pages/PageList";
+import ClientList from '../pages/ClientList'
+import ClientsScreen from '../pages/Clients'
+import FormMaker from "../pages/FormBuilder";
+import ApiManager from "../config/apiManager";
 import allActions from "../actions/allActions";
-import { usePastDelay, lazy } from "react-lazy-no-flicker";
+import { Spinner } from "../components/Spinner";
+import pageInfo from '../pages/AddPageInformation'
+import ClientInfoScreen from '../pages/ClientInfo'
+import SlideBar from "../components/common/sidebar";
+import { useDispatch, useSelector } from "react-redux";
 import HbsPage from "../pages/viewPage/CheckingHtml.js";
-import AddPageInformation from "../pages/AddPageInformation";
+import { usePastDelay, lazy } from "react-lazy-no-flicker";
+import AllIndustriesCompareScreen from '../pages/AllIndustriesCompare'
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import ProductivityBasedIndustriesScreen from '../pages/ProductivityBasedIndustries'
 
 const App = () => {
   const state = useSelector((state) => state);
-  console.log("state", state?.pageReducer);
   const dispatch = useDispatch();
   const apiManager = ApiManager.getInstance();
-  const HomeScreen = lazy(() => import("../pages/Home"));
-  const ClientsScreen = lazy(() => import("../pages/Clients"));
-  const ClientInfoScreen = lazy(() => import("../pages/ClientInfo"));
-  const FormList = lazy(() => import("../pages/FormList"));
-  const ClientList = lazy(() => import("../pages/ClientList"));
+  // const HomeScreen = lazy(() => import("../pages/Home"));
+  // const ClientsScreen = lazy(() => import("../pages/Clients"));
+  // const ClientInfoScreen = lazy(() => import("../pages/ClientInfo"));
+  // const FormList = lazy(() => import("../pages/FormList"));
+  // const ClientList = lazy(() => import("../pages/ClientList"));
   const RenderHtmlCss = lazy(() => import("../pages/viewPage/RenderHtmlCss"));
   const viewPage = lazy(() => import("../pages/viewPage/ViewPage"));
   const CompanySalesDetailsScreen = lazy(() =>
     import("../pages/CompanySalesDetails")
   );
-  const pageInfo = lazy(() => import("../pages/AddPageInformation"));
-
-  const PageList = lazy(() => import("../pages/PageList"));
-
-  const UpdateProfileScreen = lazy(() => import("../pages/UpdateProfile"));
-  const AllIndustriesCompareScreen = lazy(() =>
-    import("../pages/AllIndustriesCompare")
-  );
-  const ProductivityBasedIndustriesScreen = lazy(() =>
-    import("../pages/ProductivityBasedIndustries")
-  );
-  const ClientForm = lazy(() => import("../pages/ClientForm"));
-
-  const ClientForm2 = lazy(() => import("../pages/ClientForm2"));
   const FormEditor = lazy(() => import("../pages/FormEditor"));
+  const ClientForm = lazy(() => import("../pages/ClientForm"));
+  const ClientForm2 = lazy(() => import("../pages/ClientForm2"));
   const FormGenerator = lazy(() => import("../pages/FormGenerator"));
+  const UpdateProfileScreen = lazy(() => import("../pages/UpdateProfile"));
+  const NotificationDetail = lazy(() => import("../components/Notification/NotificationDetail")
+);
   const Component = () => {
     const past_delay = usePastDelay();
     if (!past_delay) return null;
@@ -53,7 +52,7 @@ const App = () => {
     apiManager
       .get("getPages")
       .then((response) => {
-        console.log("getPages", response);
+        console.log("getPages", state?.pageReducer.pages);
         if (response.message === 6575) {
           dispatch(allActions.pageAction.setPages(response.result));
         }
@@ -64,7 +63,7 @@ const App = () => {
   };
   const getforms = () => {
     apiManager
-      .post("getForms")
+      .get("getForms")
       .then((response) => {
         console.log("getforms", response);
         if (response.message === 6579) {
@@ -75,13 +74,6 @@ const App = () => {
         console.log(error);
       });
   };
-  React.useEffect(() => {
-    getPages();
-    getforms();
-  }, []);
-  const NotificationDetail = lazy(() =>
-    import("../components/Notification/NotificationDetail")
-  );
 
   return (
     <Router>
@@ -100,6 +92,11 @@ const App = () => {
               <Route
                 path="/AllIndustriesCompare"
                 component={AllIndustriesCompareScreen}
+                exact
+              />
+               <Route
+                path="/FormBuilder"
+                component={FormMaker}
                 exact
               />
               <Route
@@ -131,19 +128,23 @@ const App = () => {
                 exact />
 
               <Route path="/PageList" component={PageList} exact />
-              {state?.pageReducer?.pages.lenght
+              <Route path="/FormGenerator" component={FormGenerator} exact />
+              <Route path="/ViewPage" component={viewPage} exact />
+              <Route path="/RenderHtmlCss" component={RenderHtmlCss} exact />
+              <Route path="/CheckingHtml" component={HbsPage} exact />
+              <Route path="/Preview" component={Preview} exact />
+              <Route path="/Help" component={Help} exact />
+
+              {/* {state?.pageReducer?.pages
                 ? state?.pageReducer?.pages.map((item, index) => {
+                  console.log('state?.pageReducer.pages',item)
                     return (
                       <Route key={index}>
                         <ReactTemplate path={item.path} html={item.html} />
                       </Route>
                     );
                   })
-                : null}
-              <Route path="/FormGenerator" component={FormGenerator} exact />
-              <Route path="/ViewPage" component={viewPage} exact />
-              <Route path="/RenderHtmlCss" component={RenderHtmlCss} exact />
-              <Route path="/CheckingHtml" component={HbsPage} exact />
+                : null} */}
             </Switch>
           </div>
         </SlideBar>

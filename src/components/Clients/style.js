@@ -11,7 +11,7 @@ const style = {
     height: "45vh",
     boxShadow: "lg",
     overflowY: "scroll",
-    marginY: 2,
+    marginY: 1,
     borderRadius: 10,
     flexDirection: "column",
     backgroundColor: theme.customColors.white[100],

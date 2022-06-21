@@ -12,17 +12,13 @@ import {
   useColorModeValue,
   useMediaQuery,
 } from "@chakra-ui/react";
-import { RenderTabView } from "../components/FormListComponent/fomlistComponet";
-import theme from "../config/color";
 import LangContext from "../context/languageContext";
 import styles from "../components/ClientFromList/styles";
-import All from "../components/FormListComponent/All";
-import Publish from "../components/FormListComponent/Publish";
-import Unpublish from "../components/FormListComponent/Unpublish";
 import { useSelector, useDispatch } from "react-redux";
-
+import Clientlist from "../components/Client/ClientList";
+import { useAuthState, useAuthDispatch } from "../context/authContext";
+import ApiManager from '../config/apiManager'
 const ClientList = () => {
-  const Tabs = ["All", "Publish", "Unpublish"];
   const colors = useColorModeValue(
     ["white", "white", "white"],
     ["black", "green", "yellow.200"]
@@ -30,31 +26,66 @@ const ClientList = () => {
   const [tabIndex, setTabIndex] = React.useState(0);
   const { currentLangData } = React.useContext(LangContext);
   const [isMobile] = useMediaQuery("(max-width: 768px)");
-  const bg = colors[tabIndex];
-  const [name,setName]=React.useState('')
-  const [value ,setValue]=React.useState('')
-  const [selectedTab, setSelectedTab] = React.useState("All");
+  const dispatch=useAuthDispatch()
+  const [name, setName] = React.useState("");
+  const [value, setValue] = React.useState("");
   const state = useSelector((state) => state);
-  const [users,setFoundUsers]=React.useState(state?.merchantReducer?.merchants)
+  const [users, setFoundUsers] = React.useState(
+    state?.merchantReducer?.merchants.docs
+  );
+  const [client, setClient] = React.useState([]);
+  const [updateClientList, setUpdateClientList] = React.useState([]);
+  const apiManager=ApiManager.getInstance()
 
-   console.log('clients',)
-   const filter = (e) => {
+  const approveAdmin = (email,status) => {
+    let body={
+      email:email,
+      active:status === true ?false :true
+    }
+    apiManager
+      .post('approveAdmin', body)
+      .then((approveAdmin) => {
+        if(approveAdmin.message === 6613){
+          // getAllClients()        
+          window.location.reload()
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const getAllClients = () => {
+    apiManager
+      .get(currentLangData.apis.getAllClients, {})
+      .then((response) => {
+        console.log("getAllClients", response);
+        if (response.message === 6558) {
+          setUpdateClientList(response.result.docs)
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  console.log("itemList", state?.merchantReducer?.merchants.docs);
+  const filter = (e) => {
     const keyword = e.target.value;
 
-    if (keyword !== '') {
-      const results = state?.merchantReducer?.merchants.filter((user) => {
+    if (keyword !== "") {
+      const results = users.filter((user) => {
         return user.displayName.toLowerCase().startsWith(keyword.toLowerCase());
         // Use the toLowerCase() method to make it case-insensitive
       });
-      setFoundUsers(results);
+      setClient(results);
     } else {
-      setFoundUsers(state?.merchantReducer?.merchants);
+      setClient("");
       // If the text field is empty, show all users
     }
 
     setName(keyword);
   };
-  console.log('users',state?.merchantReducer?.merchants)
+  console.log("users", state?.merchantReducer?.merchants);
   const renderSearchbarFlex = () => {
     return (
       <Flex
@@ -68,27 +99,21 @@ const ClientList = () => {
           </Button> */}
         </Flex>
         <Flex {...styles.searchFlex}>
-          <Input onClick={(e)=>setValue(e)} bg={'rgb(246,246,250)'} placeholder={'Search New Client'} width={"35%"} />
-          <Button  onClick={()=>filter(value)} {...styles.btnSearch}>Search</Button>
+          <Input
+            onClick={(e) => setValue(e)}
+            bg={"rgb(246,246,250)"}
+            placeholder={"Search New Client"}
+            width={"35%"}
+          />
+          <Button onClick={() => filter(value)} {...styles.btnSearch}>
+            Search
+          </Button>
         </Flex>
       </Flex>
     );
   };
 
-  const renderTabsData = (selectedTab) => {
-    return {
-      All: <All client={'111'} clients={users} />,
-      Publish: <Publish clients={users}/>,
-      Unpublish: <Unpublish clients={users} />,
-    }[selectedTab];
-  };
-  const renderTitle = (tab) => {
-    return {
-      Procress: currentLangData.app.procressProduction,
-      Profile: "Clients Profile",
-      Performance: "Total Sales 2022",
-    }[tab];
-  };
+  
 
   return (
     //     <Suspense>
@@ -125,8 +150,12 @@ const ClientList = () => {
           <Text {...styles.ppLabel}>{renderTitle(selectedTab)}</Text>
         </Flex>
       )} */}
-      
-      {renderTabsData(selectedTab)}
+      <Clientlist
+        clients={
+          client.length > 0 ? client : updateClientList.lenght ?updateClientList: state?.merchantReducer?.merchants?.docs
+        }
+        onChangeStatus={(email,status)=>approveAdmin(email,status)}
+      />
     </Flex>
     //     </Suspense>
   );

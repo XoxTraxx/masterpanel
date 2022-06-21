@@ -1,20 +1,20 @@
 import theme from "../../config/color";
 const styles = {
   mainContainer: {
-    flex: 1,
+    // flex: 1,
     padding: 5,
     paddingLeft: 20,
   },
   secondFlex: {
-    flex: 1,
+    flex: 2,
     paddingRight: 10,
     paddingTop: 16,
-    background: "#ffffff",
+    background: "white",
   },
   formFlex: {
     flex: 3,
     padding: "5",
-    background: "#fff",
+    backgroundColor: "#fff",
     flexDirection: "column",
   },
   txtRegistered: {
@@ -60,16 +60,17 @@ const styles = {
   },
   uploadAttachments: {
     padding: 1,
-    marginX: 10,
+    // marginX: 10,
     borderWidth: 2,
-    width: "150px",
+    width: "100%",
     borderRadius: "20",
-    maxWidth: "280px",
+    // maxWidth: "280px",
     alignItems: "center",
     borderColor: "gray",
     borderStyle: "dashed",
     justifyContent: "center",
     flexDirection: "column",
+    // backgroundColor: "red",
   },
   iconStyle: {
     size: "40px",
@@ -85,7 +86,7 @@ const styles = {
     width: "300" / 2.2,
     height: "7",
     marginTop: "10",
-    alignSelf: "end",
+    alignSelf: "center",
     backgroundColor: theme.customColors.masterpanelColors[100],
   },
   flexTextBold: {

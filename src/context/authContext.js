@@ -6,7 +6,7 @@ import {
   useReducer,
   useRef,
 } from "react"; 
-
+import firebase from 'firebase/app';
 import ApiManager from "../config/apiManager";
 import config from "../config/config";
 import firebaseApp from '../firebase'
@@ -125,19 +125,29 @@ export const AuthProvider = ({ children }) => {
   // };
 
   useEffect(async () => {
-    
-    const msg = firebaseApp.messaging();
+    let msg = null
+    if (firebase.messaging.isSupported()){
+      msg = firebaseApp.messaging();
+  }
+    let messaging = null;
+
     let fcToken=''
-   msg.getToken({ vapidKey: 'BLbszOZ-YI7x26zjVJ1mt5zMdt5tOh1pU0qzeF4bJu9PqGXCwpniV69zko_bm24Ad0s2hwgSbso7RrW5NGqPoCw' }).then((token)=>{
+    if(msg){
+   msg.getToken({ vapidKey: 'BCuBqEFv_CPV7UNxK1VCFfR2Xe4nnxHOv3TNJV3_y-b0UrJUCDwWeMBtwD9NrACe0RZocbHaYizJWeSOyk8pdjo' }).then((token)=>{
       fcToken=token
       sendSessionToServer( config.fcmKey,token);
 
-   }).catch(error=>console.log('firebaseError',error))
+   }).catch(error=>{console.log('firebaseError',error)
+   ;
+   sendSessionToServer( config.fcmKey,'222430');
 
+  })
    msg.onMessage(response=>{
      console.log('response is',response)
    })
-  }, []);
+  } else{
+    sendSessionToServer( config.fcmKey,'222430');
+  } }, []);
 
   // useEffect(() => {
   //   if (isInitialMount.current) {
